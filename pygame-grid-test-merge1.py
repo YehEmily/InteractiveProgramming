@@ -45,12 +45,33 @@ class Player(object):
         self.ypos = ypos
         self.history = (xpos+1,ypos+1)
 
+class Monster(object):
+    def __init__(self, player, grid, xposition=20, yposition=20):
+        self.xpos = xposition 
+        self.ypos = yposition
+        self.player = player
+        self.history = (xposition+1, yposition+1)
+        self.grid = grid
+
+    def move(self, grid, speed=1):
+        self.history = (self.xpos,self.ypos)
+        if self.xpos > self.player.xpos and self.grid[self.xpos-1,self.ypos] != 1:
+            self.xpos -= speed
+        elif self.xpos < self.player.xpos and self.grid[self.xpos+1,self.ypos] != 1:
+            self.xpos += speed
+
+        elif self.ypos > self.player.ypos and self.grid[self.xpos,self.ypos-1] != 1:
+            self.ypos -= speed
+        elif self.ypos < self.player.ypos and self.grid[self.xpos,self.ypos+1] != 1:
+            self.ypos += speed
+
 class DungeonModel(object):
     def __init__(self, x, y, xpos, ypos):
         self.x = x
         self.y = y
         self.Grid = numpy.ones((x,y))
         self.Player = Player(xpos,ypos)
+        self.Monster = Monster(self.Player, self.Grid)
         # print self.Grid
         generate_rectangles(self.Player, 5, 8, self.Grid, self.x, self.y, 40, 40)
         # self.Grid[0, :] = self.Grid[-1, :] = 1
@@ -93,6 +114,8 @@ class PyGameKeyboardController(object):
             self.model.Player.ypos -=1
         elif event.key == pygame.K_DOWN and self.model.Grid[self.model.Player.xpos,self.model.Player.ypos+1] == 0:
             self.model.Player.ypos +=1
+        
+        self.model.Monster.move(self.model.Monster.grid)
 
 
 class DungeonModelView(object):
@@ -119,6 +142,13 @@ class DungeonModelView(object):
             pygame.draw.rect(self.screen, pygame.Color('black'), b)
         pygame.display.update()
 
+    def drawMonster(self):
+        p = pygame.Rect(self.model.Monster.xpos * self.size[1]/float(self.model.y), self.model.Monster.ypos * self.size[1]/float(self.model.y), self.size[1]/float(self.model.y), self.size[1]/float(self.model.y))
+        pygame.draw.rect(self.screen, pygame.Color('green'), p)
+        if self.model.Monster.xpos != self.model.Monster.history[0] or self.model.Monster.ypos != self.model.Monster.history[1]:
+            b = pygame.Rect(self.model.Monster.history[0] * self.size[1]/float(self.model.y), self.model.Monster.history[1] * self.size[1]/float(self.model.y), self.size[1]/float(self.model.y), self.size[1]/float(self.model.y))
+            pygame.draw.rect(self.screen, pygame.Color('black'), b)
+        pygame.display.update()
 
 if __name__ == '__main__':
     pygame.init()
@@ -140,4 +170,5 @@ if __name__ == '__main__':
                 pygame.display.quit()
             controller.handle_event(event)
         view.drawPlayer()
+        view.drawMonster()
         time.sleep(.01)
