@@ -31,72 +31,82 @@ class Player(object):
         self.hasKey = hasKey
 
 class Monster(object):
-    def __init__(self, player, grid, xposition=60, yposition=60):
+    def __init__(self, xposition=60, yposition=60):
         self.xpos = xposition 
         self.ypos = yposition
-        self.player = player
         self.history = (xposition+1, yposition+1, xposition+1, yposition+1)
+
+
+class MonsterPack(object):
+    def __init__(self,player,grid,monsters): #monsters is list of monsters
+        self.player = player
         self.grid = grid
+        self.monsters = monsters
+        self.coordinates = [(monster.xpos,monster.ypos) for monster in self.monsters]
+
 
     def move(self, grid, speed=1):
-        self.history = (self.xpos, self.ypos, self.history[0], self.history[1])
-        change_in_position = 0
-        if self.xpos > self.player.xpos and self.grid[self.xpos-1,self.ypos] == 0:
-            self.xpos -= speed
-            change_in_position = abs(self.history[0] - self.history[2])
-            return
+        for monster in self.monsters:
+            monster.history = (monster.xpos, monster.ypos, monster.history[0], monster.history[1])
+            change_in_position = 0
+            if monster.xpos > self.player.xpos and self.grid[monster.xpos-1,monster.ypos] == 0:
+                monster.xpos -= speed
+                change_in_position = abs(monster.history[0] - monster.history[2])
+                # return
 
-        elif self.xpos < self.player.xpos and self.grid[self.xpos+1,self.ypos] == 0:
-            self.xpos += speed
-            change_in_position = abs(self.history[0] - self.history[2])
-            return
+            elif monster.xpos < self.player.xpos and self.grid[monster.xpos+1,monster.ypos] == 0:
+                monster.xpos += speed
+                change_in_position = abs(monster.history[0] - monster.history[2])
+                # return
 
-        elif self.ypos > self.player.ypos and self.grid[self.xpos,self.ypos-1] == 0:
-            self.ypos -= speed
-            change_in_position = abs(self.history[1] - self.history[3])
-            return
+            elif monster.ypos > self.player.ypos and self.grid[monster.xpos,monster.ypos-1] == 0:
+                monster.ypos -= speed
+                change_in_position = abs(monster.history[1] - monster.history[3])
+                # return
 
-        elif self.ypos < self.player.ypos and self.grid[self.xpos,self.ypos+1] == 0:
-            self.ypos += speed
-            change_in_position = abs(self.history[1] - self.history[3])
-            return
+            elif monster.ypos <self.player.ypos and self.grid[monster.xpos,monster.ypos+1] == 0:
+                monster.ypos += speed
+                change_in_position = abs(monster.history[1] - monster.history[3])
+                # return
 
-        elif change_in_position == 0:
-            # self.grid[self.xpos,self.ypos] = 1
-            if self.xpos < self.player.xpos and self.grid[self.xpos+1,self.ypos+1] == 1 and self.grid[self.xpos,self.ypos-1] == 0:
-                self.grid[self.history[0],self.history[1]] = 1
-                self.ypos -= 1
-            elif self.xpos > self.player.xpos and self.grid[self.xpos-1,self.ypos+1] == 1 and self.grid[self.xpos,self.ypos-1] == 0:
-                self.grid[self.history[0],self.history[1]] = 1
-                self.ypos -= 1
-            elif self.ypos > self.player.ypos and self.grid[self.xpos+1,self.ypos-1] == 1 and self.grid[self.xpos-1,self.ypos] == 0:
-                self.grid[self.history[0],self.history[1]] = 1
-                self.xpos -= 1
-            elif self.ypos > self.player.ypos and self.grid[self.xpos-1,self.ypos-1] == 1 and self.grid[self.xpos+1,self.ypos] == 0:
-                self.grid[self.history[0],self.history[1]] = 1
-                self.xpos += 1
-            return
+            elif change_in_position == 0:
+                # self.grid[monster.xpos,monster.ypos] = 1
+                if monster.xpos < self.player.xpos and self.grid[monster.xpos+1,monster.ypos+1] == 1 and self.grid[monster.xpos,monster.ypos-1] == 0:
+                    self.grid[monster.history[0],monster.history[1]] = 2
+                    monster.ypos -= 1
+                elif monster.xpos > self.player.xpos and self.grid[monster.xpos-1,monster.ypos+1] == 1 and self.grid[monster.xpos,monster.ypos-1] == 0:
+                    self.grid[monster.history[0],monster.history[1]] = 2
+                    monster.ypos -= 1
+                elif monster.ypos > self.player.ypos and self.grid[monster.xpos+1,monster.ypos-1] == 1 and self.grid[monster.xpos-1,monster.ypos] == 0:
+                    self.grid[monster.history[0],monster.history[1]] = 2
+                    monster.xpos -= 1
+                elif monster.ypos > self.player.ypos and self.grid[monster.xpos-1,monster.ypos-1] == 1 and self.grid[monster.xpos+1,monster.ypos] == 0:
+                    self.grid[monster.history[0],monster.history[1]] = 2
+                    monster.xpos += 1
+                # return    
+            self.coordinates = [(monster.xpos,monster.ypos) for monster in self.monsters]
 
     # def move(self, grid, speed=1):
-    #     self.history = (self.xpos,self.ypos, self.history[0], self.history[1])
-    #     if self.xpos > self.player.xpos and self.grid[self.xpos-1,self.ypos] == 0:
-    #         self.xpos -= speed
-    #     elif self.xpos < self.player.xpos and self.grid[self.xpos+1,self.ypos] == 0:
-    #         self.xpos += speed
+    #     self.history = (monster.xpos,self.ypos, self.history[0], self.history[1])
+    #     if monster.xpos > self.player.xpos and self.grid[monster.xpos-1,self.ypos] == 0:
+    #         monster.xpos -= speed
+    #     elif monster.xpos < self.player.xpos and self.grid[monster.xpos+1,self.ypos] == 0:
+    #         monster.xpos += speed
 
-    #     elif self.ypos > self.player.ypos and self.grid[self.xpos,self.ypos-1] == 0:
+    #     elif self.ypos > self.player.ypos and self.grid[monster.xpos,self.ypos-1] == 0:
     #         self.ypos -= speed
-    #     elif self.ypos < self.player.ypos and self.grid[self.xpos,self.ypos+1] == 0:
+    #     elif self.ypos < self.player.ypos and self.grid[monster.xpos,self.ypos+1] == 0:
     #         self.ypos += speed
 
 
 class DungeonModel(object):
-    def __init__(self, x, y, xpos, ypos, won = False, eaten = False):
+    def __init__(self, x, y, xpos, ypos, monsternum = 3, won = False, eaten = False):
         self.x = x
         self.y = y
         self.Grid = numpy.ones((x,y))
         self.Player = Player(xpos,ypos, False)
-        self.Monster = Monster(self.Player, self.Grid)
+        self.monsternum = monsternum
+
         self.won = won
         self.eaten = eaten
 
@@ -146,7 +156,15 @@ class DungeonModel(object):
         emptylist.remove(emptylist[coord])
         coord1 = randint(0,len(emptylist)-1)
         (self.ChestX,self.ChestY) = (emptylist[coord1][0],emptylist[coord1][1])
-        self.Grid[(self.ChestX,self.ChestY)] = 2
+        self.Grid[(self.ChestX,self.ChestY)] = 1
+        emptylist.remove(emptylist[coord1])
+        MonsterLst = []
+        for i in range(self.monsternum):
+            coord = randint(0,len(emptylist)-1)
+            MonsterLst.append(Monster(emptylist[coord][0],emptylist[coord][1]))
+            emptylist.remove(emptylist[coord])
+
+        self.MonsterPack = MonsterPack(self.Player, self.Grid, MonsterLst)
         # print self.KeyX
         # print self.KeyY
         # print emptylist
@@ -175,13 +193,13 @@ class PyGameKeyboardController(object):
             # if keys[pygame.K_DOWN] and self.model.Player.ypos < self.model.y - 1:
             #   self.model.Player.ypos +=1
         
-        if event.key == pygame.K_LEFT and self.model.Grid[self.model.Player.xpos-1,self.model.Player.ypos] == 0:
+        if event.key == pygame.K_LEFT and self.model.Grid[self.model.Player.xpos-1,self.model.Player.ypos] != 1:
             self.model.Player.xpos -= 1
-        elif event.key == pygame.K_RIGHT and self.model.Grid[self.model.Player.xpos+1,self.model.Player.ypos] == 0:
+        elif event.key == pygame.K_RIGHT and self.model.Grid[self.model.Player.xpos+1,self.model.Player.ypos] != 1:
             self.model.Player.xpos += 1
-        elif event.key == pygame.K_UP and self.model.Grid[self.model.Player.xpos,self.model.Player.ypos-1] == 0:
+        elif event.key == pygame.K_UP and self.model.Grid[self.model.Player.xpos,self.model.Player.ypos-1] != 1:
             self.model.Player.ypos -=1
-        elif event.key == pygame.K_DOWN and self.model.Grid[self.model.Player.xpos,self.model.Player.ypos+1] == 0:
+        elif event.key == pygame.K_DOWN and self.model.Grid[self.model.Player.xpos,self.model.Player.ypos+1] != 1:
             self.model.Player.ypos +=1
         if self.model.Player.xpos == self.model.KeyX and self.model.Player.ypos == self.model.KeyY:
             self.model.Player.hasKey = True
@@ -189,9 +207,11 @@ class PyGameKeyboardController(object):
             self.model.Grid[self.model.ChestX,self.model.ChestY] = 0
         if (self.model.Player.xpos,self.model.Player.ypos)==(self.model.ChestX,self.model.ChestY):
             self.model.won = True
-        self.model.Monster.move(self.model.Monster.grid)
-        if (self.model.Player.xpos,self.model.Player.ypos)==(self.model.Monster.xpos,self.model.Monster.ypos):
-            self.model.eaten = True
+        self.model.MonsterPack.move(self.model.MonsterPack.grid)
+        for coord in self.model.MonsterPack.coordinates:
+            # print coord
+            if coord == (self.model.Player.xpos,self.model.Player.ypos):
+                self.model.eaten = True
 
 class DungeonModelView(object):
     def __init__(self, model, screen, size):
@@ -229,17 +249,19 @@ class DungeonModelView(object):
         pygame.display.update()
 
     def drawMonster(self):
-        if self.model.eaten == False:
-            p = pygame.Rect(self.model.Monster.xpos * self.size[1]/float(self.model.y), self.model.Monster.ypos * self.size[1]/float(self.model.y), self.size[1]/float(self.model.y), self.size[1]/float(self.model.y))
-            pygame.draw.rect(self.screen, pygame.Color('green'), p)
-            if self.model.Monster.xpos != self.model.Monster.history[0] or self.model.Monster.ypos != self.model.Monster.history[1]:
-                b = pygame.Rect(self.model.Monster.history[0] * self.size[1]/float(self.model.y), self.model.Monster.history[1] * self.size[1]/float(self.model.y), self.size[1]/float(self.model.y), self.size[1]/float(self.model.y))
-                pygame.draw.rect(self.screen, pygame.Color('black'), b)
-            if self.model.Monster.xpos != self.model.Monster.history[2] or self.model.Monster.ypos != self.model.Monster.history[3]:
-                b1 = pygame.Rect(self.model.Monster.history[2] * self.size[1]/float(self.model.y), self.model.Monster.history[3] * self.size[1]/float(self.model.y), self.size[1]/float(self.model.y), self.size[1]/float(self.model.y))
-                pygame.draw.rect(self.screen, pygame.Color('black'), b1)
-        else:
-            self.screen.fill(pygame.Color('red'))
+        for monster in self.model.MonsterPack.monsters:
+            # print len(self.model.MonsterPack.monsters)
+            if self.model.eaten == False:
+                p = pygame.Rect(monster.xpos * self.size[1]/float(self.model.y), monster.ypos * self.size[1]/float(self.model.y), self.size[1]/float(self.model.y), self.size[1]/float(self.model.y))
+                pygame.draw.rect(self.screen, pygame.Color('green'), p)
+                if monster.xpos != monster.history[0] or monster.ypos != monster.history[1]:
+                    b = pygame.Rect(monster.history[0] * self.size[1]/float(self.model.y), monster.history[1] * self.size[1]/float(self.model.y), self.size[1]/float(self.model.y), self.size[1]/float(self.model.y))
+                    pygame.draw.rect(self.screen, pygame.Color('black'), b)
+                if monster.xpos != monster.history[2] or monster.ypos != monster.history[3]:
+                    b1 = pygame.Rect(monster.history[2] * self.size[1]/float(self.model.y), monster.history[3] * self.size[1]/float(self.model.y), self.size[1]/float(self.model.y), self.size[1]/float(self.model.y))
+                    pygame.draw.rect(self.screen, pygame.Color('black'), b1)
+            else:
+                self.screen.fill(pygame.Color('red'))
         pygame.display.update()
 
 if __name__ == '__main__':
@@ -260,7 +282,7 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == QUIT:
                 running == False
-                pygame.display.quit()
+                pygame.quit()
             controller.handle_event(event)
         view.drawPlayer()
         view.drawMonster()

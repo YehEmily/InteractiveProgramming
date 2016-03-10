@@ -39,43 +39,49 @@ class Monster(object):
         self.grid = grid
 
     def move(self, grid, speed=1):
-        self.history = (self.xpos, self.ypos, self.history[0], self.history[1])
+        self.history = (self.xpos, self.ypos, self.history[0], self.history[1]) #Current position coordinates, past position coordinates
         change_in_position = 0
-        if self.xpos > self.player.xpos and self.grid[self.xpos-1,self.ypos] == 0:
+
+        if self.xpos >= self.player.xpos and self.grid[self.xpos-1,self.ypos] != 1:
             self.xpos -= speed
             change_in_position = abs(self.history[0] - self.history[2])
-            return
 
-        elif self.xpos < self.player.xpos and self.grid[self.xpos+1,self.ypos] == 0:
+        if self.xpos <= self.player.xpos and self.grid[self.xpos+1,self.ypos] != 1:
             self.xpos += speed
             change_in_position = abs(self.history[0] - self.history[2])
-            return
 
-        elif self.ypos > self.player.ypos and self.grid[self.xpos,self.ypos-1] == 0:
+        if self.ypos >= self.player.ypos and self.grid[self.xpos,self.ypos-1] != 1:
             self.ypos -= speed
             change_in_position = abs(self.history[1] - self.history[3])
-            return
 
-        elif self.ypos < self.player.ypos and self.grid[self.xpos,self.ypos+1] == 0:
+        if self.ypos <= self.player.ypos and self.grid[self.xpos,self.ypos+1] != 1:
             self.ypos += speed
             change_in_position = abs(self.history[1] - self.history[3])
-            return
 
-        elif change_in_position == 0:
-            # self.grid[self.xpos,self.ypos] = 1
-            if self.xpos < self.player.xpos and self.grid[self.xpos+1,self.ypos+1] == 1 and self.grid[self.xpos,self.ypos-1] == 0:
-                self.grid[self.history[0],self.history[1]] = 1
+
+
+        if change_in_position == 0:
+            if self.xpos < self.player.xpos and self.ypos > self.player.ypos and self.grid[self.xpos+1,self.ypos] == 1:
+                self.grid[self.history[0]] = 1
+                self.ypos += 1
+                change_in_position = abs(self.history[1] - self.history[3])
+
+            if self.xpos < self.player.xpos and self.ypos < self.player.ypos and self.grid[self.xpos+1,self.ypos] == 1:
+                self.grid[self.history[0]] = 1
                 self.ypos -= 1
-            elif self.xpos > self.player.xpos and self.grid[self.xpos-1,self.ypos+1] == 1 and self.grid[self.xpos,self.ypos-1] == 0:
-                self.grid[self.history[0],self.history[1]] = 1
+                change_in_position = abs(self.history[1] - self.history[3])
+
+            if self.xpos > self.player.xpos and self.ypos > self.player.ypos and self.grid[self.xpos-1,self.ypos] == 1:
+                self.grid[self.history[0]] = 1
+                self.ypos += 1
+                change_in_position = abs(self.history[1] - self.history[3])
+
+            if self.xpos > self.player.xpos and self.ypos < self.player.ypos:
+                self.grid[self.history[0]] = 1
                 self.ypos -= 1
-            elif self.ypos > self.player.ypos and self.grid[self.xpos+1,self.ypos-1] == 1 and self.grid[self.xpos-1,self.ypos] == 0:
-                self.grid[self.history[0],self.history[1]] = 1
-                self.xpos -= 1
-            elif self.ypos > self.player.ypos and self.grid[self.xpos-1,self.ypos-1] == 1 and self.grid[self.xpos+1,self.ypos] == 0:
-                self.grid[self.history[0],self.history[1]] = 1
-                self.xpos += 1
-            return
+                change_in_position = abs(self.history[1] - self.history[3])
+
+            print self.xpos, self.ypos, self.player.xpos, self.player.ypos
 
     # def move(self, grid, speed=1):
     #     self.history = (self.xpos,self.ypos, self.history[0], self.history[1])
